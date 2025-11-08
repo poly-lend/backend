@@ -1,0 +1,35 @@
+{
+  "scripts": {
+    "start": "npx ts-node src/runner.ts",
+    "build": "rm -rf build && tsc",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@eslint/js": "^9.15.0",
+    "@jest/types": "^29.6.3",
+    "@types/bn.js": "^5.1.6",
+    "@types/bs58": "^4.0.4",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.14.1",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.12.0",
+    "jest": "^29.7.0",
+    "prettier": "3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0"
+  }
+}
