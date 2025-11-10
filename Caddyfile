@@ -1,11 +1,15 @@
 api.polylend.com {
-    reverse_proxy api:3001
-
-    header {
-        Access-Control-Allow-Origin *
-        Access-Control-Allow-Credentials true
-        Access-Control-Allow-Methods *
-        Access-Control-Allow-Headers *
+    @cors_preflight method OPTIONS
+    handle @cors_preflight {
+        header {
+            Access-Control-Allow-Origin "http://localhost:3000,https://polylend.com" # Replace with your origin(s)
+            Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            Access-Control-Allow-Headers "Content-Type, Authorization" # Add any other required headers
+            Access-Control-Max-Age "3600" # Cache preflight response for 1 hour
+        }
+        respond "" 204 # Respond with an empty body and 204 No Content status
     }
+    
+    reverse_proxy api:3001
 }
 
