@@ -1,0 +1,4 @@
+api.polylend.com {
+    reverse_proxy api:3001
+}
+
