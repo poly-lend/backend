@@ -1,0 +1,18 @@
+networks:
+  polylend-network:
+    driver: bridge
+
+services:
+  api:
+    image: polylend-api
+    networks:
+      - polylend-network
+    container_name: polylend-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=production
+    command: ['node', 'build/runner.js']
