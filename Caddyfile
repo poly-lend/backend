@@ -1,4 +1,11 @@
 api.polylend.com {
     reverse_proxy api:3001
+
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers *
+    }
 }
 
