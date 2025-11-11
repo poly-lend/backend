@@ -1,6 +1,7 @@
 {
   "scripts": {
     "api": "npx ts-node src/api.ts",
+    "listener": "npx ts-node src/listener.ts",
     "build": "rm -rf build && tsc",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
@@ -16,9 +17,9 @@
     "@jest/types": "^29.6.3",
     "@types/bn.js": "^5.1.6",
     "@types/bs58": "^4.0.4",
+    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
-    "@types/express": "^5.0.0",
     "babel-jest": "^29.7.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
@@ -32,6 +33,7 @@
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "pino": "^9.6.0",
-    "pino-pretty": "^13.0.0"
+    "pino-pretty": "^13.0.0",
+    "viem": "^2.38.6"
   }
 }
