@@ -7,7 +7,16 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
-    command: ['node', 'build/runner.js']
+    command: ['node', 'build/api.js']
+  listener:
+    image: polylend-listener
+    container_name: polylend-listener
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    command: ['node', 'build/listener.js']
   caddy:
     image: caddy
     container_name: polylend-caddy

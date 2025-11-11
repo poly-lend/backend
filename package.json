@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "npx ts-node src/runner.ts",
+    "api": "npx ts-node src/api.ts",
     "build": "rm -rf build && tsc",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
