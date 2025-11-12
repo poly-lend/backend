@@ -1,5 +1,5 @@
 export type LoanRequest = {
-  requestId: string
+  _id: string
   borrower: `0x${string}`
   borrowerWallet: `0x${string}`
   positionId: string
@@ -8,7 +8,7 @@ export type LoanRequest = {
 }
 
 export type LoanOffer = {
-  offerId: string
+  _id: string
   requestId: string
   lender: `0x${string}`
   loanAmount: string
@@ -16,7 +16,7 @@ export type LoanOffer = {
 }
 
 export type Loan = {
-  loanId: string
+  _id: string
   borrower: `0x${string}`
   borrowerWallet: `0x${string}`
   lender: `0x${string}`
