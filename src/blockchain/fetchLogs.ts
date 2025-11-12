@@ -2,6 +2,7 @@ import { parseEventLogs } from 'viem'
 import { BLOCK_INTERVAL, polylendAddress, START_BLOCK } from '../config'
 import { polylendConfig } from '../contracts/polylend'
 import { publicClient } from '../utils/blockchain'
+import { sleep } from '../utils/common'
 
 export type DataIds = {
   requests: number[]
@@ -69,6 +70,7 @@ export async function getDataIds(blockNumber: bigint) {
 
     currentBlock += BLOCK_INTERVAL
     counter++
+    await sleep(1000)
   }
   dataIds.requests = [...new Set(dataIds.requests)]
   dataIds.offers = [...new Set(dataIds.offers)]
