@@ -23,27 +23,35 @@ export async function extractIds(events: any[]): Promise<DataIds> {
   }
   for (const event of events) {
     switch (event.eventName) {
-      case 'LoanRequested':
-        dataIds.requests.push(event.args.id.toString())
-        break
-      case 'LoanOffered':
-        dataIds.offers.push(event.args.id.toString())
-        break
       case 'LoanAccepted':
         dataIds.loans.push(event.args.id.toString())
+        dataIds.requests.push(event.args.requestId.toString())
+        dataIds.offers.push(event.args.offerId.toString())
         break
       case 'LoanCalled':
         dataIds.loans.push(event.args.id.toString())
         break
+      case 'LoanOffered':
+        dataIds.offers.push(event.args.id.toString())
+        break
       case 'LoanRepaid':
         dataIds.loans.push(event.args.id.toString())
+        break
+      case 'LoanRequested':
+        dataIds.requests.push(event.args.id.toString())
+        break
+      case 'LoanTransferred':
+        dataIds.loans.push(event.args.newId.toString())
+        dataIds.loans.push(event.args.oldId.toString())
         break
       case 'LoanReclaimed':
         dataIds.loans.push(event.args.id.toString())
         break
-      case 'LoanTransferred':
-        dataIds.loans.push(event.args.newId.toString())
-        dataIds.offers.push(event.args.oldId.toString())
+      case 'LoanRequestCanceled':
+        dataIds.requests.push(event.args.id.toString())
+        break
+      case 'LoanOfferCanceled':
+        dataIds.offers.push(event.args.id.toString())
         break
     }
   }

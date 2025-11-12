@@ -34,6 +34,8 @@ export const polylendConfig = {
       anonymous: false,
       inputs: [
         { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+        { indexed: true, internalType: 'uint256', name: 'requestId', type: 'uint256' },
+        { indexed: true, internalType: 'uint256', name: 'offerId', type: 'uint256' },
         { indexed: false, internalType: 'uint256', name: 'startTime', type: 'uint256' },
       ],
       name: 'LoanAccepted',
