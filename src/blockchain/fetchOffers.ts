@@ -4,16 +4,14 @@ import { polylendConfig } from '../contracts/polylend'
 import { LoanOffer } from '../types/polyLend'
 import { publicClient } from '../utils/blockchain'
 
-export const fetchOffers = async (): Promise<LoanOffer[]> => {
-  const calls = []
-  for (var i = 0; i < 100; i++) {
-    calls.push({
-      address: polylendAddress as `0x${string}`,
-      abi: polylendConfig.abi,
-      functionName: 'offers',
-      args: [i],
-    })
-  }
+export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
+  const calls = ids.map((id) => ({
+    address: polylendAddress as `0x${string}`,
+    abi: polylendConfig.abi,
+    functionName: 'offers',
+    args: [id],
+  }))
+
   const offersData = await publicClient.multicall({
     contracts: calls,
   })

@@ -3,11 +3,14 @@ import { BLOCK_INTERVAL, polylendAddress, START_BLOCK } from '../config'
 import { polylendConfig } from '../contracts/polylend'
 import { publicClient } from '../utils/blockchain'
 import { sleep } from '../utils/common'
+import { fetchLoans } from './fetchLoans'
+import { fetchOffers } from './fetchOffers'
+import { fetchRequests } from './fetchRequests'
 
 export type DataIds = {
-  requests: number[]
-  offers: number[]
-  loans: number[]
+  requests: string[]
+  offers: string[]
+  loans: string[]
 }
 
 async function extractIds(events: any[]): Promise<DataIds> {
@@ -19,33 +22,33 @@ async function extractIds(events: any[]): Promise<DataIds> {
   for (const event of events) {
     switch (event.eventName) {
       case 'LoanRequested':
-        dataIds.requests.push(Number(event.args.id))
+        dataIds.requests.push(event.args.id.toString())
         break
       case 'LoanOffered':
-        dataIds.offers.push(Number(event.args.id))
+        dataIds.offers.push(event.args.id.toString())
         break
       case 'LoanAccepted':
-        dataIds.loans.push(Number(event.args.id))
+        dataIds.loans.push(event.args.id.toString())
         break
       case 'LoanCalled':
-        dataIds.loans.push(Number(event.args.id))
+        dataIds.loans.push(event.args.id.toString())
         break
       case 'LoanRepaid':
-        dataIds.loans.push(Number(event.args.id))
+        dataIds.loans.push(event.args.id.toString())
         break
       case 'LoanReclaimed':
-        dataIds.loans.push(Number(event.args.id))
+        dataIds.loans.push(event.args.id.toString())
         break
       case 'LoanTransferred':
-        dataIds.loans.push(Number(event.args.newId))
-        dataIds.offers.push(Number(event.args.oldId))
+        dataIds.loans.push(event.args.newId.toString())
+        dataIds.offers.push(event.args.oldId.toString())
         break
     }
   }
   return dataIds
 }
 
-export async function getDataIds(blockNumber: bigint) {
+export async function fetchData(blockNumber: bigint) {
   let currentBlock = START_BLOCK
   let counter = 0
   const dataIds: DataIds = {
@@ -77,5 +80,9 @@ export async function getDataIds(blockNumber: bigint) {
   dataIds.loans = [...new Set(dataIds.loans)]
   console.log(`Processed ${counter} iterations`)
   console.log(dataIds)
+  const loans = await fetchLoans(dataIds.loans)
+  const requests = await fetchRequests(dataIds.requests)
+  const offers = await fetchOffers(dataIds.offers)
+
   return dataIds
 }
