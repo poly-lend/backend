@@ -84,35 +84,31 @@ export async function fetchData(blockNumber: bigint) {
   const requests = await fetchRequests(dataIds.requests)
   const offers = await fetchOffers(dataIds.offers)
 
-  const bulkWriteOps: any[] = []
-  loans.forEach((loan) => {
-    bulkWriteOps.push({
-      updateOne: {
-        filter: { _id: loan._id },
-        update: { $set: loan },
-        upsert: true,
-      },
-    })
-  })
-  requests.forEach((request) => {
-    bulkWriteOps.push({
-      updateOne: {
-        filter: { _id: request._id },
-        update: { $set: request },
-        upsert: true,
-      },
-    })
-  })
-  offers.forEach((offer) => {
-    bulkWriteOps.push({
-      updateOne: {
-        filter: { _id: offer._id },
-        update: { $set: offer },
-        upsert: true,
-      },
-    })
-  })
-  await mongoDb.collection('offers').bulkWrite(bulkWriteOps)
+  const loanBulkWriteOps = loans.map((loan) => ({
+    updateOne: {
+      filter: { _id: loan._id },
+      update: { $set: loan },
+      upsert: true,
+    },
+  })) as any // @ts-ignore
+  const requestBulkWriteOps = requests.map((request) => ({
+    updateOne: {
+      filter: { _id: request._id as any },
+      update: { $set: request },
+      upsert: true,
+    } as any, // @ts-ignore
+  }))
 
+  const offerBulkWriteOps = offers.map((offer) => ({
+    updateOne: {
+      filter: { _id: offer._id as any },
+      update: { $set: offer },
+      upsert: true,
+    },
+  })) as any // @ts-ignore
+
+  await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps)
+  await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps)
+  await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps)
   logger.info(`Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
 }
