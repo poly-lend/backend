@@ -10,7 +10,7 @@ async function main() {
   const blockNumber = await publicClient.getBlockNumber()
   //logger.info(`🔄 Listening data from block ${blockNumber}...`)
 
-  await getDataIds(Number(blockNumber))
+  await getDataIds(blockNumber)
 }
 
 main().catch(console.error)

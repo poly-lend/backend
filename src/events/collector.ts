@@ -44,7 +44,7 @@ async function extractIds(events: any[]): Promise<DataIds> {
   return dataIds
 }
 
-export async function getDataIds(blockNumber: number) {
+export async function getDataIds(blockNumber: bigint) {
   let currentBlock = START_BLOCK
   let counter = 0
   const dataIds: DataIds = {
@@ -52,11 +52,11 @@ export async function getDataIds(blockNumber: number) {
     offers: [],
     loans: [],
   }
-  while (currentBlock < blockNumber) {
+  while (currentBlock <= blockNumber) {
     const events = await publicClient!.getLogs({
       address: polylendAddress,
       fromBlock: BigInt(currentBlock),
-      toBlock: BigInt(Math.min(currentBlock + BLOCK_INTERVAL, blockNumber)),
+      toBlock: BigInt(Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))),
     })
     const logs = parseEventLogs({
       abi: polylendConfig.abi,
