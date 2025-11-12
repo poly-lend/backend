@@ -3,6 +3,8 @@ import { BLOCK_INTERVAL, polylendAddress, START_BLOCK } from '../config'
 import { polylendConfig } from '../contracts/polylend'
 import { publicClient } from '../utils/blockchain'
 import { sleep } from '../utils/common'
+import logger from '../utils/logger'
+import { mongoDb } from '../utils/mongodb'
 import { fetchLoans } from './fetchLoans'
 import { fetchOffers } from './fetchOffers'
 import { fetchRequests } from './fetchRequests'
@@ -78,11 +80,12 @@ export async function fetchData(blockNumber: bigint) {
   dataIds.requests = [...new Set(dataIds.requests)]
   dataIds.offers = [...new Set(dataIds.offers)]
   dataIds.loans = [...new Set(dataIds.loans)]
-  console.log(`Processed ${counter} iterations`)
-  console.log(dataIds)
   const loans = await fetchLoans(dataIds.loans)
+  mongoDb.collection('loans').insertMany(loans)
   const requests = await fetchRequests(dataIds.requests)
+  mongoDb.collection('requests').insertMany(requests)
   const offers = await fetchOffers(dataIds.offers)
-
+  mongoDb.collection('offers').insertMany(offers)
+  logger.info(`Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
   return dataIds
 }
