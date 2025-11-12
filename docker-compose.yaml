@@ -1,4 +1,10 @@
 services:
+  mongo:
+    image: mongo
+    container_name: polylend-mongo
+    volumes:
+      - ./data/mongo:/data/db
+    restart: unless-stopped
   api:
     image: polylend-api
     container_name: polylend-api
@@ -7,6 +13,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017
     command: ['node', 'build/api.js']
   listener:
     image: polylend-listener
@@ -16,6 +23,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017
     command: ['node', 'build/listener.js']
   caddy:
     image: caddy
