@@ -88,7 +88,7 @@ export async function fetchDataFromChain(dataIds: DataIds) {
   await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps)
   await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps)
   await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps)
-  logger.info(`Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
+  logger.info(`✅ Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
 }
 
 export async function fetchData(blockNumber: bigint) {
@@ -118,7 +118,7 @@ export async function fetchData(blockNumber: bigint) {
 
     currentBlock += BLOCK_INTERVAL
     counter++
-    await sleep(1000)
+    await sleep(100)
   }
   await fetchDataFromChain(dataIds)
 }
