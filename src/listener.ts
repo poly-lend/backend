@@ -30,7 +30,7 @@ async function main() {
   await fetchData(blockNumber)
 
   while (true) {
-    sleep(1000)
+    await sleep(1000)
   }
 }
 
