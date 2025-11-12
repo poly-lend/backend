@@ -15,7 +15,7 @@ export type DataIds = {
   loans: string[]
 }
 
-async function extractIds(events: any[]): Promise<DataIds> {
+export async function extractIds(events: any[]): Promise<DataIds> {
   const dataIds: DataIds = {
     requests: [],
     offers: [],
@@ -50,33 +50,7 @@ async function extractIds(events: any[]): Promise<DataIds> {
   return dataIds
 }
 
-export async function fetchData(blockNumber: bigint) {
-  let currentBlock = START_BLOCK
-  let counter = 0
-  const dataIds: DataIds = {
-    requests: [],
-    offers: [],
-    loans: [],
-  }
-  while (currentBlock <= blockNumber) {
-    const events = await publicClient!.getLogs({
-      address: polylendAddress,
-      fromBlock: BigInt(currentBlock),
-      toBlock: BigInt(Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))),
-    })
-    const logs = parseEventLogs({
-      abi: polylendConfig.abi,
-      logs: events,
-    })
-    const newDataIds = await extractIds(logs)
-    dataIds.requests.push(...newDataIds.requests)
-    dataIds.offers.push(...newDataIds.offers)
-    dataIds.loans.push(...newDataIds.loans)
-
-    currentBlock += BLOCK_INTERVAL
-    counter++
-    await sleep(1000)
-  }
+export async function fetchDataFromChain(dataIds: DataIds) {
   dataIds.requests = [...new Set(dataIds.requests)]
   dataIds.offers = [...new Set(dataIds.offers)]
   dataIds.loans = [...new Set(dataIds.loans)]
@@ -111,4 +85,34 @@ export async function fetchData(blockNumber: bigint) {
   await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps)
   await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps)
   logger.info(`Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
+}
+
+export async function fetchData(blockNumber: bigint) {
+  let currentBlock = START_BLOCK
+  let counter = 0
+  const dataIds: DataIds = {
+    requests: [],
+    offers: [],
+    loans: [],
+  }
+  while (currentBlock <= blockNumber) {
+    const events = await publicClient!.getLogs({
+      address: polylendAddress,
+      fromBlock: BigInt(currentBlock),
+      toBlock: BigInt(Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))),
+    })
+    const logs = parseEventLogs({
+      abi: polylendConfig.abi,
+      logs: events,
+    })
+    const newDataIds = await extractIds(logs)
+    dataIds.requests.push(...newDataIds.requests)
+    dataIds.offers.push(...newDataIds.offers)
+    dataIds.loans.push(...newDataIds.loans)
+
+    currentBlock += BLOCK_INTERVAL
+    counter++
+    await sleep(1000)
+  }
+  await fetchDataFromChain(dataIds)
 }
