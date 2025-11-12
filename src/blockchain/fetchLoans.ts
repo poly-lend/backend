@@ -16,7 +16,7 @@ export const fetchLoans = async (ids: string[]): Promise<Loan[]> => {
 
   return loansData.map(
     (loan: any): Loan => ({
-      loanId: loan.result[0].toString(),
+      _id: loan.result[0].toString(),
       borrower: loan.result[1] as `0x${string}`,
       borrowerWallet: loan.result[2],
       lender: loan.result[3] as `0x${string}`,

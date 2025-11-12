@@ -81,11 +81,38 @@ export async function fetchData(blockNumber: bigint) {
   dataIds.offers = [...new Set(dataIds.offers)]
   dataIds.loans = [...new Set(dataIds.loans)]
   const loans = await fetchLoans(dataIds.loans)
-  mongoDb.collection('loans').insertMany(loans)
   const requests = await fetchRequests(dataIds.requests)
-  mongoDb.collection('requests').insertMany(requests)
   const offers = await fetchOffers(dataIds.offers)
-  mongoDb.collection('offers').insertMany(offers)
+
+  const bulkWriteOps: any[] = []
+  loans.forEach((loan) => {
+    bulkWriteOps.push({
+      updateOne: {
+        filter: { _id: loan._id },
+        update: { $set: loan },
+        upsert: true,
+      },
+    })
+  })
+  requests.forEach((request) => {
+    bulkWriteOps.push({
+      updateOne: {
+        filter: { _id: request._id },
+        update: { $set: request },
+        upsert: true,
+      },
+    })
+  })
+  offers.forEach((offer) => {
+    bulkWriteOps.push({
+      updateOne: {
+        filter: { _id: offer._id },
+        update: { $set: offer },
+        upsert: true,
+      },
+    })
+  })
+  await mongoDb.collection('offers').bulkWrite(bulkWriteOps)
+
   logger.info(`Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
-  return dataIds
 }

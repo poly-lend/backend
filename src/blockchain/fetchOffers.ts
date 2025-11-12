@@ -18,7 +18,7 @@ export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
 
   return offersData.map(
     (offer: any, index: number): LoanOffer => ({
-      offerId: offer.result[0].toString(),
+      _id: offer.result[0].toString(),
       requestId: offer.result[1].toString(),
       lender: offer.result[2] as `0x${string}`,
       loanAmount: offer.result[3].toString(),
