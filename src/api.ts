@@ -31,8 +31,8 @@ app.get('/markets', async (req, res) => {
       remainingIds.push(id)
     }
   }
-  console.log('Cached ids:', result.length)
-  console.log('Remaining ids:', remainingIds.length)
+  logger.info(`Cached ids: ${result.length} of ${clobTokenIds.length}`)
+
   if (remainingIds.length > 0) {
     const params = remainingIds.map((id: string) => `clob_token_ids=${id}`)
     const url = `http://gamma-api.polymarket.com/markets?${params.join('&')}`
