@@ -85,9 +85,9 @@ export async function fetchDataFromChain(dataIds: DataIds) {
   })) as any // @ts-ignore
 
   logger.info(`🔄 Inserting ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
-  await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps)
-  await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps)
-  await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps)
+  offerBulkWriteOps.length > 0 && (await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps))
+  requestBulkWriteOps.length > 0 && (await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps))
+  loanBulkWriteOps.length > 0 && (await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps))
   logger.info(`✅ Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
 }
 

@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import NodeCache from 'node-cache'
 import logger from './utils/logger'
+import { initializeMongoDb, mongoDb } from './utils/mongodb'
 
 const cache = new NodeCache({ stdTTL: 60 * 5 })
 
@@ -9,6 +10,36 @@ dotenv.config()
 
 const app = express()
 const port = 3001
+
+app.get('/loans', async (req, res) => {
+  const loans = await mongoDb
+    .collection('loans')
+    .find({
+      borrower: { $ne: '0x0000000000000000000000000000000000000000' },
+    })
+    .toArray()
+  res.send(loans)
+})
+
+app.get('/requests', async (req, res) => {
+  const requests = await mongoDb
+    .collection('requests')
+    .find({
+      borrower: { $ne: '0x0000000000000000000000000000000000000000' },
+    })
+    .toArray()
+  res.send(requests)
+})
+
+app.get('/offers', async (req, res) => {
+  const offers = await mongoDb
+    .collection('offers')
+    .find({
+      lender: { $ne: '0x0000000000000000000000000000000000000000' },
+    })
+    .toArray()
+  res.send(offers)
+})
 
 app.get('/markets', async (req, res) => {
   const result: any[] = []
@@ -55,6 +86,9 @@ app.get('/markets', async (req, res) => {
 
 async function main() {
   logger.info('🚀 Starting...')
+  logger.info(`🔄 Connecting to MongoDB`)
+  await initializeMongoDb()
+  logger.info(`✅ Connected to MongoDB`)
   app.listen(port, () => {
     logger.info(`Listening on port ${port}`)
   })
