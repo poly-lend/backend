@@ -54,6 +54,9 @@ export async function fetchDataFromChain(dataIds: DataIds) {
   dataIds.requests = [...new Set(dataIds.requests)]
   dataIds.offers = [...new Set(dataIds.offers)]
   dataIds.loans = [...new Set(dataIds.loans)]
+  logger.info(
+    `🔄 Fetching ${dataIds.loans.length} loans, ${dataIds.requests.length} requests, ${dataIds.offers.length} offers`,
+  )
   const loans = await fetchLoans(dataIds.loans)
   const requests = await fetchRequests(dataIds.requests)
   const offers = await fetchOffers(dataIds.offers)
@@ -81,6 +84,7 @@ export async function fetchDataFromChain(dataIds: DataIds) {
     },
   })) as any // @ts-ignore
 
+  logger.info(`🔄 Inserting ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
   await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps)
   await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps)
   await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps)
@@ -96,10 +100,12 @@ export async function fetchData(blockNumber: bigint) {
     loans: [],
   }
   while (currentBlock <= blockNumber) {
+    const toBlock = Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))
+    logger.info(`🔄 Fetching data from block ${currentBlock} to ${toBlock}`)
     const events = await publicClient!.getLogs({
       address: polylendAddress,
       fromBlock: BigInt(currentBlock),
-      toBlock: BigInt(Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))),
+      toBlock: BigInt(toBlock),
     })
     const logs = parseEventLogs({
       abi: polylendConfig.abi,
