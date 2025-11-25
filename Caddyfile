@@ -1,4 +1,5 @@
 api.polylend.com {
+    encode gzip
     @cors_preflight method OPTIONS
     handle @cors_preflight {
         header {
