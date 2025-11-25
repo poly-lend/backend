@@ -11,6 +11,8 @@ dotenv.config()
 const app = express()
 const port = 3001
 
+const ENABLED_EVENTS = ['presidential-election-winner-2028']
+
 app.get('/loans', async (req, res) => {
   const loans = await mongoDb
     .collection('loans')
@@ -41,6 +43,28 @@ app.get('/offers', async (req, res) => {
   res.send(offers)
 })
 
+app.get('/events', async (req, res) => {
+  const result: any[] = []
+  for (const event of ENABLED_EVENTS) {
+    const cacheKey = `event:${event}`
+    const item = cache.get(cacheKey)
+    if (item) {
+      result.push(item)
+      continue
+    }
+    const url = `https://gamma-api.polymarket.com/events/slug/${event}`
+    const response = await fetch(url)
+    if (!response.ok) {
+      res.status(response.status).send(response.statusText)
+      return
+    }
+    const eventData: any = await response.json()
+    cache.set(cacheKey, eventData)
+    result.push(eventData)
+  }
+  res.send(result)
+})
+
 app.get('/markets', async (req, res) => {
   const result: any[] = []
   let clobTokenIdsParam = req.query.clob_token_ids
@@ -55,7 +79,8 @@ app.get('/markets', async (req, res) => {
 
   const remainingIds = []
   for (const id of clobTokenIds) {
-    const item = cache.get(id)
+    const cacheKey = `market:${id}`
+    const item = cache.get(cacheKey)
     if (item) {
       result.push(item)
     } else {
@@ -76,7 +101,8 @@ app.get('/markets', async (req, res) => {
     for (const item of data) {
       const ids = JSON.parse(item.clobTokenIds)
       for (const id of ids) {
-        cache.set(id, item)
+        const cacheKey = `market:${id}`
+        cache.set(cacheKey, item)
       }
       result.push(item)
     }
