@@ -183,6 +183,13 @@ export const polylendConfig = {
       type: 'function',
     },
     {
+      inputs: [{ internalType: 'uint256', name: '_offerId', type: 'uint256' }],
+      name: 'getOffersPositionIds',
+      outputs: [{ internalType: 'uint256[]', name: '', type: 'uint256[]' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
       inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
       name: 'loans',
       outputs: [
@@ -252,19 +259,8 @@ export const polylendConfig = {
         { internalType: 'uint256', name: 'minimumLoanAmount', type: 'uint256' },
         { internalType: 'uint256', name: 'duration', type: 'uint256' },
         { internalType: 'uint256', name: 'startTime', type: 'uint256' },
-        { internalType: 'uint256', name: 'positionIdsCount', type: 'uint256' },
         { internalType: 'bool', name: 'perpetual', type: 'bool' },
       ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        { internalType: 'uint256', name: '', type: 'uint256' },
-        { internalType: 'uint256', name: '', type: 'uint256' },
-      ],
-      name: 'offersPositionIds',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
       stateMutability: 'view',
       type: 'function',
     },
