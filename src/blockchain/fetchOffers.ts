@@ -40,7 +40,7 @@ export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
       duration: offer.result[7].toString(),
       startTime: offer.result[8].toString(),
       positionIds: positionIds.map((positionId: any) => positionId.toString()),
-      perpetual: offer.result[9].toString(),
+      perpetual: offer.result[9],
     }
   })
 }
