@@ -16,13 +16,31 @@ export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
     contracts: calls,
   })
 
-  return offersData.map(
-    (offer: any, index: number): LoanOffer => ({
+  const positionIdCalls = ids.map((id) => ({
+    address: polylendAddress as `0x${string}`,
+    abi: polylendConfig.abi,
+    functionName: 'getOffersPositionIds',
+    args: [id],
+  }))
+  const positionIdsData = await publicClient.multicall({
+    contracts: positionIdCalls,
+  })
+
+  return offersData.map((offer: any, index: number): LoanOffer => {
+    const positionIds = positionIdsData[index]?.result as unknown as string[]
+
+    return {
       _id: offer.result[0].toString(),
-      requestId: offer.result[1].toString(),
-      lender: offer.result[2] as `0x${string}`,
-      loanAmount: offer.result[3].toString(),
-      rate: offer.result[4].toString(),
-    }),
-  )
+      lender: offer.result[1] as `0x${string}`,
+      loanAmount: offer.result[2].toString(),
+      rate: offer.result[3].toString(),
+      borrowedAmount: offer.result[4].toString(),
+      collateralAmount: offer.result[5].toString(),
+      minimumLoanAmount: offer.result[6].toString(),
+      duration: offer.result[7].toString(),
+      startTime: offer.result[8].toString(),
+      positionIds: positionIds.map((positionId: any) => positionId.toString()),
+      perpetual: offer.result[9].toString(),
+    }
+  })
 }

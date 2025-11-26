@@ -27,6 +27,8 @@ export const fetchLoans = async (ids: string[]): Promise<Loan[]> => {
       startTime: loan.result[8].toString(),
       minimumDuration: loan.result[9].toString(),
       callTime: loan.result[10].toString(),
+      offerId: loan.result[11].toString(),
+      isTransfered: loan.result[12].toString(),
     }),
   )
 }

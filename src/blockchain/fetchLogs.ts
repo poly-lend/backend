@@ -71,7 +71,7 @@ export async function fetchDataFromChain(dataIds: DataIds) {
     },
   })) as any // @ts-ignore
 
-  logger.info(`🔄 Inserting ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
+  logger.info(`🔄 Inserting ${loans.length} loans, ${offers.length} offers`)
   offerBulkWriteOps.length > 0 && (await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps))
   loanBulkWriteOps.length > 0 && (await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps))
   logger.info(`✅ Inserted ${loans.length} loans, ${offers.length} offers`)
@@ -81,7 +81,6 @@ export async function fetchData(blockNumber: bigint) {
   let currentBlock = START_BLOCK
   let counter = 0
   const dataIds: DataIds = {
-    requests: [],
     offers: [],
     loans: [],
   }
@@ -98,7 +97,6 @@ export async function fetchData(blockNumber: bigint) {
       logs: events,
     })
     const newDataIds = await extractIds(logs)
-    dataIds.requests.push(...newDataIds.requests)
     dataIds.offers.push(...newDataIds.offers)
     dataIds.loans.push(...newDataIds.loans)
 
