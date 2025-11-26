@@ -7,7 +7,6 @@ import logger from '../utils/logger'
 import { mongoDb } from '../utils/mongodb'
 import { fetchLoans } from './fetchLoans'
 import { fetchOffers } from './fetchOffers'
-import { fetchRequests } from './fetchRequests'
 
 export type DataIds = {
   requests: string[]
@@ -66,7 +65,6 @@ export async function fetchDataFromChain(dataIds: DataIds) {
     `🔄 Fetching ${dataIds.loans.length} loans, ${dataIds.requests.length} requests, ${dataIds.offers.length} offers`,
   )
   const loans = await fetchLoans(dataIds.loans)
-  const requests = await fetchRequests(dataIds.requests)
   const offers = await fetchOffers(dataIds.offers)
 
   const loanBulkWriteOps = loans.map((loan) => ({
