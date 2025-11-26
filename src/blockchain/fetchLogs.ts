@@ -9,14 +9,12 @@ import { fetchLoans } from './fetchLoans'
 import { fetchOffers } from './fetchOffers'
 
 export type DataIds = {
-  requests: string[]
   offers: string[]
   loans: string[]
 }
 
 export async function extractIds(events: any[]): Promise<DataIds> {
   const dataIds: DataIds = {
-    requests: [],
     offers: [],
     loans: [],
   }
@@ -24,7 +22,6 @@ export async function extractIds(events: any[]): Promise<DataIds> {
     switch (event.eventName) {
       case 'LoanAccepted':
         dataIds.loans.push(event.args.id.toString())
-        dataIds.requests.push(event.args.requestId.toString())
         dataIds.offers.push(event.args.offerId.toString())
         break
       case 'LoanCalled':
@@ -36,18 +33,12 @@ export async function extractIds(events: any[]): Promise<DataIds> {
       case 'LoanRepaid':
         dataIds.loans.push(event.args.id.toString())
         break
-      case 'LoanRequested':
-        dataIds.requests.push(event.args.id.toString())
-        break
       case 'LoanTransferred':
         dataIds.loans.push(event.args.newId.toString())
         dataIds.loans.push(event.args.oldId.toString())
         break
       case 'LoanReclaimed':
         dataIds.loans.push(event.args.id.toString())
-        break
-      case 'LoanRequestCanceled':
-        dataIds.requests.push(event.args.id.toString())
         break
       case 'LoanOfferCanceled':
         dataIds.offers.push(event.args.id.toString())
@@ -58,12 +49,9 @@ export async function extractIds(events: any[]): Promise<DataIds> {
 }
 
 export async function fetchDataFromChain(dataIds: DataIds) {
-  dataIds.requests = [...new Set(dataIds.requests)]
   dataIds.offers = [...new Set(dataIds.offers)]
   dataIds.loans = [...new Set(dataIds.loans)]
-  logger.info(
-    `🔄 Fetching ${dataIds.loans.length} loans, ${dataIds.requests.length} requests, ${dataIds.offers.length} offers`,
-  )
+  logger.info(`🔄 Fetching ${dataIds.loans.length} loans, ${dataIds.offers.length} offers`)
   const loans = await fetchLoans(dataIds.loans)
   const offers = await fetchOffers(dataIds.offers)
 
@@ -74,13 +62,6 @@ export async function fetchDataFromChain(dataIds: DataIds) {
       upsert: true,
     },
   })) as any // @ts-ignore
-  const requestBulkWriteOps = requests.map((request) => ({
-    updateOne: {
-      filter: { _id: request._id as any },
-      update: { $set: request },
-      upsert: true,
-    } as any, // @ts-ignore
-  }))
 
   const offerBulkWriteOps = offers.map((offer) => ({
     updateOne: {
@@ -92,9 +73,8 @@ export async function fetchDataFromChain(dataIds: DataIds) {
 
   logger.info(`🔄 Inserting ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
   offerBulkWriteOps.length > 0 && (await mongoDb.collection('offers').bulkWrite(offerBulkWriteOps))
-  requestBulkWriteOps.length > 0 && (await mongoDb.collection('requests').bulkWrite(requestBulkWriteOps))
   loanBulkWriteOps.length > 0 && (await mongoDb.collection('loans').bulkWrite(loanBulkWriteOps))
-  logger.info(`✅ Inserted ${loans.length} loans, ${requests.length} requests, ${offers.length} offers`)
+  logger.info(`✅ Inserted ${loans.length} loans, ${offers.length} offers`)
 }
 
 export async function fetchData(blockNumber: bigint) {
