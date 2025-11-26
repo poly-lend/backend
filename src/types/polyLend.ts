@@ -1,18 +1,15 @@
-export type LoanRequest = {
-  _id: string
-  borrower: `0x${string}`
-  borrowerWallet: `0x${string}`
-  positionId: string
-  collateralAmount: string
-  minimumDuration: string
-}
-
 export type LoanOffer = {
   _id: string
-  requestId: string
   lender: `0x${string}`
   loanAmount: string
   rate: string
+  borrowedAmount: string
+  collateralAmount: string
+  minimumLoanAmount: string
+  duration: string
+  startTime: string
+  positionIds: string[]
+  perpetual: boolean
 }
 
 export type Loan = {
@@ -25,6 +22,8 @@ export type Loan = {
   loanAmount: string
   rate: string
   startTime: string
-  callTime: string
   minimumDuration: string
+  callTime: string
+  offerId: string
+  isTransfered: boolean
 }
