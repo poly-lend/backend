@@ -16,7 +16,6 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URL=mongodb://mongo:27017
-
     command: ['node', 'build/api.js']
   listener:
     image: polylend-listener
