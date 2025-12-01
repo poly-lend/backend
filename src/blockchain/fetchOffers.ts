@@ -19,7 +19,7 @@ export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
   const positionIdCalls = ids.map((id) => ({
     address: polylendAddress as `0x${string}`,
     abi: polylendConfig.abi,
-    functionName: 'getOffersPositionIds',
+    functionName: 'getOfferPositionIds',
     args: [id],
   }))
   const positionIdsData = await publicClient.multicall({
