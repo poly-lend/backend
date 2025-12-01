@@ -3,12 +3,12 @@ export type LoanOffer = {
   lender: `0x${string}`
   loanAmount: string
   rate: string
-  borrowedAmount: string
-  collateralAmount: string
+  positionIds: string[]
+  collateralAmounts: string[]
   minimumLoanAmount: string
   duration: string
   startTime: string
-  positionIds: string[]
+  borrowedAmount: string
   perpetual: boolean
 }
 
