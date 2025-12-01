@@ -8,6 +8,8 @@ services:
   api:
     image: polylend-api
     container_name: polylend-api
+    depends_on:
+      - mongo
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,6 +21,8 @@ services:
   listener:
     image: polylend-listener
     container_name: polylend-listener
+    depends_on:
+      - mongo
     build:
       context: .
       dockerfile: Dockerfile
