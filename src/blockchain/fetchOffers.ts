@@ -45,12 +45,12 @@ export const fetchOffers = async (ids: string[]): Promise<LoanOffer[]> => {
       loanAmount: offer.result[2].toString(),
       rate: offer.result[3].toString(),
       borrowedAmount: offer.result[4].toString(),
-      collateralAmounts: collateralAmounts.map((collateralAmount: any) => collateralAmount.toString()),
-      minimumLoanAmount: offer.result[6].toString(),
-      duration: offer.result[7].toString(),
-      startTime: offer.result[8].toString(),
+      minimumLoanAmount: offer.result[5].toString(),
+      duration: offer.result[6].toString(),
+      startTime: offer.result[7].toString(),
+      perpetual: offer.result[8],
       positionIds: positionIds.map((positionId: any) => positionId.toString()),
-      perpetual: offer.result[9],
+      collateralAmounts: collateralAmounts.map((collateralAmount: any) => collateralAmount.toString()),
     }
   })
 }
