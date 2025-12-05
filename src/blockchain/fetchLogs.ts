@@ -32,10 +32,12 @@ export async function extractIds(events: any[]): Promise<DataIds> {
         break
       case 'LoanRepaid':
         dataIds.loans.push(event.args.id.toString())
+        dataIds.offers.push(event.args.offerId.toString())
         break
       case 'LoanTransferred':
         dataIds.loans.push(event.args.newId.toString())
         dataIds.loans.push(event.args.oldId.toString())
+        dataIds.offers.push(event.args.offerId.toString())
         break
       case 'LoanReclaimed':
         dataIds.loans.push(event.args.id.toString())
