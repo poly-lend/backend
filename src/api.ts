@@ -13,6 +13,18 @@ const port = 3001
 
 const ENABLED_EVENTS = ['presidential-election-winner-2028']
 
+app.get('/positions', async (req, res) => {
+  const address = req.query.address as string
+  const url = `https://data-api.polymarket.com/positions?user=${address}`
+  const response = await fetch(url)
+  if (!response.ok) {
+    res.status(response.status).send(response.statusText)
+    return
+  }
+  const positions = await response.json()
+  res.send(positions)
+})
+
 app.get('/loans', async (req, res) => {
   const loans = await mongoDb
     .collection('loans')
