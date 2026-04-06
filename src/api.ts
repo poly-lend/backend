@@ -55,6 +55,48 @@ app.get('/offers', async (req, res) => {
   res.send(offers)
 })
 
+app.get('/stats', async (req, res) => {
+  const cacheKey = 'stats'
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    res.send(cached)
+    return
+  }
+
+  const [offers, loans] = await Promise.all([
+    mongoDb
+      .collection('offers')
+      .find({ lender: { $ne: '0x0000000000000000000000000000000000000000' } })
+      .toArray(),
+    mongoDb
+      .collection('loans')
+      .find({ borrower: { $ne: '0x0000000000000000000000000000000000000000' } })
+      .toArray(),
+  ])
+
+  const totalLiquidity = offers.reduce(
+    (sum, o) => sum + (Number(o.loanAmount || 0) - Number(o.borrowedAmount || 0)),
+    0,
+  )
+  const totalBorrowed = loans.reduce((sum, l) => sum + Number(l.loanAmount || 0), 0)
+  const activeLoans = loans.length
+  const activeOffers = offers.length
+  const uniqueLenders = new Set(offers.map((o) => o.lender)).size
+  const uniqueBorrowers = new Set(loans.map((l) => l.borrower)).size
+
+  const stats = {
+    totalLiquidity,
+    totalBorrowed,
+    activeLoans,
+    activeOffers,
+    uniqueLenders,
+    uniqueBorrowers,
+  }
+
+  cache.set(cacheKey, stats)
+  res.send(stats)
+})
+
 app.get('/events', async (req, res) => {
   const result: any[] = []
   for (const event of ENABLED_EVENTS) {
