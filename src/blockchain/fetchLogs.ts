@@ -1,10 +1,10 @@
 import { parseEventLogs } from 'viem'
 import { BLOCK_INTERVAL, polylendAddress, START_BLOCK } from '../config'
 import { polylendConfig } from '../contracts/polylend'
-import { publicClient } from '../utils/blockchain'
+import { httpClient } from '../utils/blockchain'
 import { sleep } from '../utils/common'
 import logger from '../utils/logger'
-import { mongoDb } from '../utils/mongodb'
+import { mongoDb, getLastProcessedBlock, setLastProcessedBlock } from '../utils/mongodb'
 import { fetchLoans } from './fetchLoans'
 import { fetchOffers } from './fetchOffers'
 
@@ -80,7 +80,9 @@ export async function fetchDataFromChain(dataIds: DataIds) {
 }
 
 export async function fetchData(blockNumber: bigint) {
-  let currentBlock = START_BLOCK
+  const lastBlock = await getLastProcessedBlock()
+  let currentBlock = lastBlock !== null ? lastBlock + 1 : START_BLOCK
+  logger.info(`🔄 Resuming from block ${currentBlock} (last processed: ${lastBlock ?? 'none'})`)
   let counter = 0
   const dataIds: DataIds = {
     offers: [],
@@ -89,7 +91,7 @@ export async function fetchData(blockNumber: bigint) {
   while (currentBlock <= blockNumber) {
     const toBlock = Math.min(currentBlock + BLOCK_INTERVAL, Number(blockNumber))
     logger.info(`🔄 Fetching data from block ${currentBlock} to ${toBlock}`)
-    const events = await publicClient!.getLogs({
+    const events = await httpClient.getLogs({
       address: polylendAddress,
       fromBlock: BigInt(currentBlock),
       toBlock: BigInt(toBlock),
@@ -104,7 +106,9 @@ export async function fetchData(blockNumber: bigint) {
 
     currentBlock += BLOCK_INTERVAL
     counter++
-    await sleep(100)
+    await sleep(500)
   }
   await fetchDataFromChain(dataIds)
+  await setLastProcessedBlock(Number(blockNumber))
+  logger.info(`✅ Checkpoint saved at block ${blockNumber}`)
 }

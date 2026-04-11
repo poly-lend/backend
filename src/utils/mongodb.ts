@@ -9,4 +9,17 @@ const initializeMongoDb = async () => {
   mongoDb = client.db('polylend')
 }
 
-export { initializeMongoDb, mongoDb }
+async function getLastProcessedBlock(): Promise<number | null> {
+  const doc = await mongoDb.collection('state').findOne({ _id: 'lastProcessedBlock' as any })
+  return doc?.block ?? null
+}
+
+async function setLastProcessedBlock(block: number): Promise<void> {
+  await mongoDb.collection('state').updateOne(
+    { _id: 'lastProcessedBlock' as any },
+    { $set: { block } },
+    { upsert: true },
+  )
+}
+
+export { initializeMongoDb, mongoDb, getLastProcessedBlock, setLastProcessedBlock }
