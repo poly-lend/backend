@@ -1,12 +1,17 @@
 import { Db, MongoClient } from 'mongodb'
 import { MONGO_URL } from '../config'
 
+let client: MongoClient
 let mongoDb: Db
 
 const initializeMongoDb = async () => {
-  const client = new MongoClient(MONGO_URL)
+  client = new MongoClient(MONGO_URL)
   await client.connect()
   mongoDb = client.db('polylend')
+}
+
+const closeMongoDb = async () => {
+  if (client) await client.close()
 }
 
 async function getLastProcessedBlock(): Promise<number | null> {
@@ -22,4 +27,4 @@ async function setLastProcessedBlock(block: number): Promise<void> {
   )
 }
 
-export { initializeMongoDb, mongoDb, getLastProcessedBlock, setLastProcessedBlock }
+export { initializeMongoDb, closeMongoDb, mongoDb, getLastProcessedBlock, setLastProcessedBlock }
