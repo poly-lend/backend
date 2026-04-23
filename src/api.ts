@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import NodeCache from 'node-cache'
 import { NETWORK } from './config'
+import { getLeaderboard, getPointsForWallet } from './points/pointsApi'
 import { seedCtHandler } from './testnet/seedCt'
 import logger from './utils/logger'
 import { initializeMongoDb, mongoDb } from './utils/mongodb'
@@ -16,7 +17,9 @@ const port = 3001
 
 if (NETWORK === 'testnet') {
   app.post('/testnet/seed-ct', seedCtHandler)
-  logger.info('🧪 Registered POST /testnet/seed-ct')
+  app.get('/testnet/points/:address', getPointsForWallet)
+  app.get('/testnet/leaderboard', getLeaderboard)
+  logger.info('🧪 Registered testnet endpoints (seed-ct, points, leaderboard)')
 }
 
 const ENABLED_EVENTS = ['presidential-election-winner-2028']
