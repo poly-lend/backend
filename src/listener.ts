@@ -3,6 +3,7 @@ import http from 'node:http'
 import { extractIds, fetchData, fetchDataFromChain } from './blockchain/fetchLogs'
 import { polylendAddress } from './config'
 import { polylendConfig } from './contracts/polylend'
+import { awardPointsFromLogs, ensurePointsIndexes } from './points/awardPoints'
 import { initBlockchain, publicClient } from './utils/blockchain'
 import { sleep } from './utils/common'
 import logger from './utils/logger'
@@ -66,6 +67,7 @@ async function runSubscription() {
         abi: polylendConfig.abi,
         onLogs: async (logs) => {
           try {
+            await awardPointsFromLogs(logs)
             const dataIds = await extractIds(logs)
             await fetchDataFromChain(dataIds)
             backoff = BACKOFF_MIN_MS
@@ -125,6 +127,7 @@ async function main() {
   logger.info('🚀 Starting...')
   logger.info(`🔄 Connecting to MongoDB`)
   await initializeMongoDb()
+  await ensurePointsIndexes()
   logger.info(`🔄 Connecting to Blockchain`)
   await initBlockchain()
 

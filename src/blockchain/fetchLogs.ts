@@ -1,6 +1,7 @@
 import { parseEventLogs } from 'viem'
 import { BLOCK_INTERVAL, polylendAddress, START_BLOCK } from '../config'
 import { polylendConfig } from '../contracts/polylend'
+import { awardPointsFromLogs } from '../points/awardPoints'
 import { httpClient } from '../utils/blockchain'
 import { sleep } from '../utils/common'
 import logger from '../utils/logger'
@@ -100,6 +101,7 @@ export async function fetchData(blockNumber: bigint) {
       abi: polylendConfig.abi,
       logs: events,
     })
+    await awardPointsFromLogs(logs)
     const newDataIds = await extractIds(logs)
     dataIds.offers.push(...newDataIds.offers)
     dataIds.loans.push(...newDataIds.loans)
