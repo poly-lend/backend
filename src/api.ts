@@ -3,6 +3,7 @@ import express from 'express'
 import NodeCache from 'node-cache'
 import { NETWORK } from './config'
 import { getLeaderboard, getPointsForWallet } from './points/pointsApi'
+import { getReferralCode, postReferralBind } from './points/referralApi'
 import { seedCtHandler } from './testnet/seedCt'
 import logger from './utils/logger'
 import { initializeMongoDb, mongoDb } from './utils/mongodb'
@@ -19,7 +20,9 @@ if (NETWORK === 'testnet') {
   app.post('/testnet/seed-ct', seedCtHandler)
   app.get('/testnet/points/:address', getPointsForWallet)
   app.get('/testnet/leaderboard', getLeaderboard)
-  logger.info('🧪 Registered testnet endpoints (seed-ct, points, leaderboard)')
+  app.get('/testnet/referral/:address', getReferralCode)
+  app.post('/testnet/referral/bind', postReferralBind)
+  logger.info('🧪 Registered testnet endpoints (seed-ct, points, leaderboard, referral)')
 }
 
 const ENABLED_EVENTS = ['presidential-election-winner-2028']

@@ -2,6 +2,7 @@ import { NETWORK } from '../config'
 import { httpClient } from '../utils/blockchain'
 import logger from '../utils/logger'
 import { mongoDb } from '../utils/mongodb'
+import { maybeAwardReferral } from './referrals'
 
 // On-chain actions scored per the points table in proposal 001.
 // Off-chain points (bug reports +50, UX feedback +5, referrals +10) are
@@ -55,6 +56,7 @@ export async function awardPointsFromLogs(logs: Log[]): Promise<void> {
   if (logs.length === 0) return
 
   const operations = []
+  const referralCheck: { wallet: string; txHash: string }[] = []
   for (const log of logs) {
     const points = POINTS_BY_EVENT[log.eventName ?? '']
     if (!points) continue
@@ -75,12 +77,27 @@ export async function awardPointsFromLogs(logs: Log[]): Promise<void> {
         upsert: true,
       },
     })
+    referralCheck.push({ wallet, txHash: log.transactionHash })
   }
 
   if (operations.length === 0) return
   const result = await mongoDb.collection('points_events').bulkWrite(operations)
   if (result.upsertedCount > 0) {
     logger.info({ inserted: result.upsertedCount, total: operations.length }, '🏅 Awarded points')
+  }
+
+  // Deduplicate by wallet so a wallet taking two actions in the same log
+  // batch only triggers one referral lookup.
+  const seen = new Set<string>()
+  for (const { wallet, txHash } of referralCheck) {
+    const key = wallet.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    try {
+      await maybeAwardReferral(wallet, txHash)
+    } catch (err) {
+      logger.warn({ err, wallet }, '⚠️ maybeAwardReferral failed')
+    }
   }
 }
 
