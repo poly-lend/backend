@@ -1,5 +1,5 @@
 import { Db, MongoClient } from 'mongodb'
-import { MONGO_URL } from '../config'
+import { MONGO_DB, MONGO_URL } from '../config'
 
 let client: MongoClient
 let mongoDb: Db
@@ -7,7 +7,7 @@ let mongoDb: Db
 const initializeMongoDb = async () => {
   client = new MongoClient(MONGO_URL)
   await client.connect()
-  mongoDb = client.db('polylend')
+  mongoDb = client.db(MONGO_DB)
 }
 
 const closeMongoDb = async () => {

@@ -58,11 +58,17 @@ npm run format:check  # Check formatting
 
 ## Environment Variables
 
-| Variable    | Description                  |
-|-------------|------------------------------|
-| `MONGO_URL` | MongoDB connection string    |
-| `RPC_URL`   | Polygon RPC endpoint         |
-| `WS_URL`    | Polygon WebSocket endpoint   |
+| Variable           | Required | Default                                        | Description                                                                 |
+|--------------------|----------|------------------------------------------------|-----------------------------------------------------------------------------|
+| `MONGO_URL`        | yes      | —                                              | MongoDB connection string                                                   |
+| `RPC_URL`          | yes      | —                                              | HTTP RPC endpoint (used for historical `getLogs` / multicall)               |
+| `WS_URL`           | yes      | —                                              | WebSocket RPC endpoint (used for real-time event subscription)              |
+| `NETWORK`          | no       | `mainnet`                                      | `mainnet` or `testnet`; gates testnet-only endpoints                        |
+| `MONGO_DB`         | no       | `polylend`                                     | Database name. Use `polylend-testnet` to keep testnet state isolated.       |
+| `POLYLEND_ADDRESS` | no       | mainnet address `0x1620A7…cEf2b`               | PolyLend contract address. Override for testnet with the deployed address.  |
+| `START_BLOCK`      | no       | `84700000`                                     | Block to scan from when no MongoDB checkpoint exists.                       |
+
+The defaults reproduce the mainnet configuration that has been running on `api.polylend.com`. The testnet listener/API images are the same; they override the four optional vars at the compose level.
 
 ## Deployment
 
