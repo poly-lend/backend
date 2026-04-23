@@ -1,6 +1,8 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import NodeCache from 'node-cache'
+import { NETWORK } from './config'
+import { seedCtHandler } from './testnet/seedCt'
 import logger from './utils/logger'
 import { initializeMongoDb, mongoDb } from './utils/mongodb'
 
@@ -9,7 +11,13 @@ const cache = new NodeCache({ stdTTL: 60 * 5 })
 dotenv.config()
 
 const app = express()
+app.use(express.json())
 const port = 3001
+
+if (NETWORK === 'testnet') {
+  app.post('/testnet/seed-ct', seedCtHandler)
+  logger.info('🧪 Registered POST /testnet/seed-ct')
+}
 
 const ENABLED_EVENTS = ['presidential-election-winner-2028']
 
