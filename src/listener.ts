@@ -11,7 +11,6 @@ import { closeMongoDb, getLastProcessedBlock, initializeMongoDb, mongoDb } from 
 dotenv.config()
 
 const HEALTH_PORT = 3002
-const MAX_LAG_BLOCKS = 1000
 const BACKOFF_MIN_MS = 1000
 const BACKOFF_MAX_MS = 30000
 
@@ -26,13 +25,20 @@ function startHealthServer() {
       return
     }
     try {
+      // Liveness is defined by what we can actually verify cheaply: mongo responds
+      // to ping, and RPC responds to getBlockNumber. The previous implementation
+      // also failed on head-vs-checkpoint lag, but the checkpoint is only
+      // advanced by gap-fills — on quiet networks (like mainnet PolyLend today)
+      // the WS subscription stays alive while the checkpoint sits at the start-up
+      // block, guaranteeing a false 503 after ~33 min. `lag` is still reported in
+      // the body as observability for ops; SRE-grade "WS silently dead" detection
+      // needs active probes, not a docker healthcheck.
       await mongoDb.command({ ping: 1 })
       const [head, checkpoint] = await Promise.all([publicClient.getBlockNumber(), getLastProcessedBlock()])
-      const lag = checkpoint !== null ? Number(head) - checkpoint : Number(head)
-      const ok = lag < MAX_LAG_BLOCKS
-      res.statusCode = ok ? 200 : 503
+      const lag = checkpoint !== null ? Number(head) - checkpoint : null
+      res.statusCode = 200
       res.setHeader('content-type', 'application/json')
-      res.end(JSON.stringify({ ok, lag, head: Number(head), checkpoint }))
+      res.end(JSON.stringify({ ok: true, head: Number(head), checkpoint, lag }))
     } catch (err) {
       res.statusCode = 503
       res.setHeader('content-type', 'application/json')
