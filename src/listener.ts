@@ -4,6 +4,7 @@ import { extractIds, fetchData, fetchDataFromChain } from './blockchain/fetchLog
 import { polylendAddress } from './config'
 import { polylendConfig } from './contracts/polylend'
 import { awardPointsFromLogs, ensurePointsIndexes } from './points/awardPoints'
+import { ensureReferralIndexes } from './points/referrals'
 import { initBlockchain, publicClient } from './utils/blockchain'
 import { sleep } from './utils/common'
 import logger from './utils/logger'
@@ -128,6 +129,7 @@ async function main() {
   logger.info(`🔄 Connecting to MongoDB`)
   await initializeMongoDb()
   await ensurePointsIndexes()
+  await ensureReferralIndexes()
   logger.info(`🔄 Connecting to Blockchain`)
   await initBlockchain()
 
